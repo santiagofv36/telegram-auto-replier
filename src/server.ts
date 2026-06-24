@@ -1,32 +1,17 @@
-import 'dotenv/config';
-
 import express from 'express';
-
-import { client, startTelegram } from './telegram';
+import { client } from './telegram';
 
 const app = express();
 
 app.get('/health', (_, res) => {
-  res.json({
-    status: 'ok',
-  });
-});
-
-const port = Number(process.env.PORT) || 3000;
-
-app.listen(port, async () => {
-  console.log(`Listening ${port}`);
-
-  await startTelegram();
+  res.json({ status: 'ok' });
 });
 
 app.get('/debug/chats', async (req, res) => {
   const token = req.headers['x-debug-key'];
 
   if (!token || token !== process.env.DEBUG_API_KEY) {
-    return res.status(403).json({
-      error: 'Forbidden',
-    });
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   const dialogs = await client.getDialogs({});
@@ -41,4 +26,10 @@ app.get('/debug/chats', async (req, res) => {
     }));
 
   res.json(groups);
+});
+
+const port = Number(process.env.PORT) || 3000;
+
+app.listen(port, () => {
+  console.log(`Listening ${port}`);
 });
